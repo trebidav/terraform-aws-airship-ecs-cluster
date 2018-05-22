@@ -28,7 +28,7 @@ data "template_file" "cloud_config_amazon" {
 
   vars {
     region          = "${data.aws_region._.name}"
-    name       = "${local.name}"
+    name            = "${local.name}"
     efs_enabled     = "${lookup(var.cluster_properties, "efs_enabled","0")}"
     efs_id          = "${lookup(var.cluster_properties, "efs_id","")}"
     custom_userdata = "${lookup(var.cluster_properties, "ec2_custom_userdata","")}"

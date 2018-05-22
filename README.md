@@ -8,10 +8,10 @@ module "ecs_web" {
   source = "github.com/blinkist/airship-tf-ecs-cluster/"
 
   name            = "${terraform.workspace}-web"
-  environment          = "${terraform.workspace}"
+  environment     = "${terraform.workspace}"
 
   vpc_id          = "${module.vpc.vpc_id}"
-  subnet_ids       = ["${module.vpc.private_subnets}"]
+  subnet_ids      = ["${module.vpc.private_subnets}"]
   
   ecs_instance_scaling_create = false
 
@@ -58,13 +58,14 @@ module "ecs_web" {
   source = "github.com/blinkist/airship-tf-ecs-cluster/"
 
   name            = "${terraform.workspace}-web"
-  environment          = "${terraform.workspace}"
+  environment     = "${terraform.workspace}"
 
   vpc_id          = "${module.vpc.vpc_id}"
-  subnet_ids       = ["${module.vpc.private_subnets}"]
+  subnet_ids      = ["${module.vpc.private_subnets}"]
   
-  ecs_instance_scaling_create = false
-  #ecs_instance_draining_lambda_arn = "${module.ecs_draining.lambda_function_arn}"
+  ecs_instance_scaling_create = true
+  ecs_instance_draining_lambda_arn = "${module.ecs_draining.lambda_function_arn}"
+
   ecs_instance_scaling_properties = [
    { 
      type = "CPUReservation"

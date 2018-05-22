@@ -6,7 +6,7 @@ module "iam" {
 module "cluster" {
   source                 = "./modules/ecs_cluster/"
   name                   = "${var.name}"
-  cluster_properties = "${var.cluster_properties}"
+  cluster_properties     = "${var.cluster_properties}"
   vpc_security_group_ids = ["${var.vpc_security_group_ids}"]
   iam_instance_profile   = "${module.iam.ecs_instance_profile}"
   tags                   = "${var.tags}"
