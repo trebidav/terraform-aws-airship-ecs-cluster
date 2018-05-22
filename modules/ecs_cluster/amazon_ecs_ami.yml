@@ -1,0 +1,41 @@
+#!/bin/bash
+set -Eeuxo pipefail
+
+cluster="${name}"
+task_def="dd-agent-task-${name}"
+
+echo ECS_CLUSTER=${name} >> /etc/ecs/ecs.config
+
+echo iptables --insert FORWARD 1 --in-interface docker+ --destination 169.254.169.254/32 --jump DROP >> /etc/rc.local
+
+
+start ecs
+yum install -y aws-cli jq
+instance_arn=$(curl -s http://localhost:51678/v1/metadata | jq -r '. | .ContainerInstanceArn' | awk -F/ '{print $NF}' )
+#
+# Run Task by Terraform.
+#
+if [ "${efs_enabled}" == "1" ]; then
+  echo aws ecs start-task --cluster ${name} --task-definition $$task_def --container-instances $$instance_arn --region ${region} >> /etc/rc.local
+fi
+
+# EFS MOUNTING
+if [ "${efs_enabled}" == "1" ]; then
+  mkdir /mnt/efs
+  if ! rpm -qa | grep -qw nfs-utils; then
+    yum -y install nfs-utils
+  fi
+  if ! rpm -qa | grep -qw python27; then
+	  yum -y install python27
+  fi
+  AZ_ZONE=$(curl -L http://169.254.169.254/latest/meta-data/placement/availability-zone);
+  DIR_SRC=$AZ_ZONE.${efs_id}.efs.${region}.amazonaws.com
+  DIR_TGT=/mnt/efs
+
+  mount -t nfs4 $DIR_SRC:/ $DIR_TGT
+  cp -p /etc/fstab /etc/fstab.back-$(date +%F)
+  #Append line to fstab
+  echo -e "$DIR_SRC:/ \t\t $DIR_TGT \t\t nfs \t\t defaults \t\t 0 \t\t 0" | tee -a /etc/fstab
+fi
+
+${custom_userdata}
