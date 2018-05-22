@@ -24,8 +24,6 @@ module "ecs_web" {
   cluster_properties {
     create = true
     ec2_key_name = "${aws_key_pair.main.key_name}"
-    #ec2_custom_userdata = "${data.template_file.extra_userdata.rendered}"
-    ec2_custom_userdata = ""
     ec2_instance_type = "t2.small"
     ec2_asg_min = "1"
     ec2_asg_max = "1"
