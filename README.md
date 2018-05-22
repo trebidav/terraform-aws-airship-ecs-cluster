@@ -111,7 +111,6 @@ module "ecs_web" {
    },
   ]
 
-
   vpc_security_group_ids = ["${module.ecs_instance_sg.this_security_group_id}","${module.admin_sg.this_security_group_id}"]
 
   tags= { 
