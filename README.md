@@ -31,6 +31,7 @@ module "ecs_web" {
 	Environment = "${terraform.workspace}"
   }
 }
+```hcl
 
 ## Usage without ECS Scaling and with EFS mounting
 
