@@ -12,14 +12,6 @@ module "ecs_web" {
 
   vpc_id          = "${module.vpc.vpc_id}"
   subnet_ids      = ["${module.vpc.private_subnets}"]
-  
-  ecs_instance_scaling_create = false
-
-  vpc_security_group_ids = ["${module.ecs_instance_sg.this_security_group_id}","${module.admin_sg.this_security_group_id}"]
-
-  tags= { 
-	Environment = "${terraform.workspace}"
-  }
 
   cluster_properties {
     create = true
@@ -30,7 +22,49 @@ module "ecs_web" {
     ec2_disk_size = "40"
     ec2_disk_type = "gp2"
   }
+  
+  ecs_instance_scaling_create = false
+
+  vpc_security_group_ids = ["${module.ecs_instance_sg.this_security_group_id}","${module.admin_sg.this_security_group_id}"]
+
+  tags= { 
+	Environment = "${terraform.workspace}"
+  }
 }
+
+## Usage without ECS Scaling and with EFS mounting
+
+```hcl
+module "ecs_web" { 
+  source = "github.com/blinkist/airship-tf-ecs-cluster/"
+
+  name            = "${terraform.workspace}-web"
+  environment     = "${terraform.workspace}"
+
+  vpc_id          = "${module.vpc.vpc_id}"
+  subnet_ids      = ["${module.vpc.private_subnets}"]
+
+  cluster_properties {
+    create = true
+    ec2_key_name = "${aws_key_pair.main.key_name}"
+    ec2_instance_type = "t2.small"
+    ec2_asg_min = "1"
+    ec2_asg_max = "1"
+    ec2_disk_size = "40"
+    ec2_disk_type = "gp2"
+    efs_enabled = true
+    efs_id = "${module.efs.aws_efs_file_system_sharedfs_id}"
+  }
+  
+  ecs_instance_scaling_create = false
+
+  vpc_security_group_ids = ["${module.ecs_instance_sg.this_security_group_id}","${module.admin_sg.this_security_group_id}"]
+
+  tags= { 
+	Environment = "${terraform.workspace}"
+  }
+}
+
 
 ```
 
@@ -61,8 +95,22 @@ module "ecs_web" {
   vpc_id          = "${module.vpc.vpc_id}"
   subnet_ids      = ["${module.vpc.private_subnets}"]
   
+  cluster_properties {
+    create = true
+    ec2_key_name = "${aws_key_pair.main.key_name}"
+    ec2_custom_userdata = "${data.template_file.extra_userdata.rendered}"
+    ec2_instance_type = "t2.small"
+    ec2_asg_min = "1"
+    ec2_asg_max = "1"
+    ec2_disk_size = "40"
+    ec2_disk_type = "gp2"
+  }
+
   ecs_instance_scaling_create = true
   ecs_instance_draining_lambda_arn = "${module.ecs_draining.lambda_function_arn}"
+
+  datadog_api_key = "Datadog API KEY"
+  datadog_enabled = true
 
   ecs_instance_scaling_properties = [
    { 
@@ -116,20 +164,6 @@ module "ecs_web" {
   tags= { 
 	Environment = "${terraform.workspace}"
   }
-
-  cluster_properties {
-    create = true
-    ec2_key_name = "${aws_key_pair.main.key_name}"
-    ec2_custom_userdata = "${data.template_file.extra_userdata.rendered}"
-    ec2_instance_type = "t2.small"
-    ec2_asg_min = "1"
-    ec2_asg_max = "1"
-    ec2_disk_size = "40"
-    ec2_disk_type = "gp2"
-  }
-
-  datadog_api_key = "Datadog API KEY"
-  datadog_enabled = true
 }
 ```
 
