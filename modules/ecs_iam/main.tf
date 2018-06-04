@@ -1,21 +1,18 @@
-resource "aws_iam_role" "ecs_service" {
-  name = "${var.name}-ecs-role"
+data "aws_iam_policy_document" "ecs_service" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2008-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ecs.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
+    principals = {
+      type        = "Service"
+      identifiers = ["ecs.amazonaws.com"]
     }
-  ]
+  }
 }
-EOF
+
+resource "aws_iam_role" "ecs_service" {
+  name               = "${var.name}-ecs-role"
+  assume_role_policy = "${data.aws_iam_policy_document.ecs_service.json}"
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_service_role_attach" {
@@ -37,24 +34,21 @@ resource "aws_iam_instance_profile" "ecs_cluster_ec2_instance_profile" {
   }
 }
 
-resource "aws_iam_role" "ecs_cluster_ec2_instance_role" {
-  name = "${var.name}_ecs-cluster-ec2_instance_role"
+data "aws_iam_policy_document" "ec2_instance" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2008-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
+    principals = {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
     }
-  ]
+  }
 }
-EOF
+
+resource "aws_iam_role" "ecs_cluster_ec2_instance_role" {
+  name               = "${var.name}_ecs-cluster-ec2_instance_role"
+  assume_role_policy = "${data.aws_iam_policy_document.ec2_instance.json}"
 
   lifecycle {
     create_before_destroy = true
