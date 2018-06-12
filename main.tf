@@ -3,11 +3,12 @@
 #
 module "iam" {
   source = "./modules/iam/"
+
   # name is used to create unique rolenames per ecs cluster
-  name   = "${var.name}"
+  name = "${var.name}"
 
   # default to true, when false no roles are created
-  create = "${var.create}"
+  create = "${var.create_roles && var.create}"
 }
 
 # 
@@ -28,7 +29,7 @@ resource "aws_ecs_cluster" "this" {
 #
 module "autoscalinggroup" {
   source                 = "./modules/autoscalinggroup/"
-  create                 = "${var.create}"
+  create                 = "${var.create_autoscalinggroup && var.create}"
   name                   = "${var.name}"
   cluster_properties     = "${var.cluster_properties}"
   vpc_security_group_ids = ["${var.vpc_security_group_ids}"]

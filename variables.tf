@@ -8,6 +8,16 @@ variable "create" {
   default     = true
 }
 
+variable "create_roles" {
+  description = "Are we creating iam roles"
+  default     = true
+}
+
+variable "create_autoscalinggroup" {
+  description = "Are we creating an autoscaling group"
+  default     = true
+}
+
 variable "ecs_instance_scaling_create" {
   default     = false
   description = "Do we want to enable instance scaling for this ECS Cluster"

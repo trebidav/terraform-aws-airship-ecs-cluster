@@ -21,7 +21,7 @@ resource "aws_autoscaling_notification" "scale_notifications" {
 }
 
 resource "aws_autoscaling_lifecycle_hook" "scale_hook" {
-  count = "${var.ecs_instance_scaling_create ? 1 : 0}"
+  count                   = "${var.ecs_instance_scaling_create ? 1 : 0}"
   name                    = "${var.asg_name}-scale-hook"
   autoscaling_group_name  = "${var.asg_name}"
   default_result          = "ABANDON"
@@ -51,7 +51,7 @@ EOF
 }
 
 data "template_file" "asg_publish_to_sns" {
-  count         = "${var.ecs_instance_scaling_create ? 1 : 0}"
+  count = "${var.ecs_instance_scaling_create ? 1 : 0}"
 
   vars {
     topic_arn = "${aws_sns_topic.asg_lifecycle.arn}"
@@ -74,7 +74,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "asg_publish_to_sns" {
-  count         = "${var.ecs_instance_scaling_create ? 1 : 0}"
+  count  = "${var.ecs_instance_scaling_create ? 1 : 0}"
   name   = "${var.asg_name}-asg-publish-to-sns"
   role   = "${aws_iam_role.asg_publish_to_sns.name}"
   policy = "${data.template_file.asg_publish_to_sns.rendered}"
@@ -90,7 +90,7 @@ resource "aws_lambda_permission" "drain_lambda" {
 }
 
 resource "aws_sns_topic_subscription" "lambda" {
-  count         = "${var.ecs_instance_scaling_create ? 1 : 0}"
+  count     = "${var.ecs_instance_scaling_create ? 1 : 0}"
   topic_arn = "${aws_sns_topic.asg_lifecycle.arn}"
   protocol  = "lambda"
   endpoint  = "${var.ecs_instance_draining_lambda_arn}"
