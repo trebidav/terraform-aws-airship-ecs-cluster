@@ -5,16 +5,8 @@ locals {
   name            = "${var.name}"
 }
 
-resource "aws_ecs_cluster" "this" {
-  name = "${local.name}"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "null_resource" "tags_as_list_of_maps" {
-  count = "${length(keys(var.tags))}"
+  count = "${(var.create ? 1 : 0 ) * length(keys(var.tags))}"
 
   triggers = "${map(
     "key", "${element(keys(var.tags), count.index)}",
@@ -36,6 +28,8 @@ data "template_file" "cloud_config_amazon" {
 }
 
 resource "aws_launch_configuration" "launch_config" {
+  count = "${var.create ? 1 : 0 }"
+
   name_prefix   = "${local.name}-"
   image_id      = "${data.aws_ami.ecs_ami.id}"
   instance_type = "${lookup(var.cluster_properties, "ec2_instance_type")}"
@@ -66,7 +60,8 @@ resource "aws_launch_configuration" "launch_config" {
 }
 
 resource "aws_autoscaling_group" "this" {
-  name = "${local.name}"
+  count = "${var.create ? 1 : 0 }"
+  name  = "${local.name}"
 
   launch_configuration = "${aws_launch_configuration.launch_config.name}"
 

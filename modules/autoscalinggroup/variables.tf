@@ -4,6 +4,10 @@ variable "tags" {
   default     = {}
 }
 
+variable "create" {
+  default = true
+}
+
 variable "cluster_properties" {
   type = "map"
 }

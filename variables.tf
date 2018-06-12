@@ -3,6 +3,11 @@ variable "name" {
   description = "the short name of the environment that is used to define it"
 }
 
+variable "create" {
+  description = "Are we creating resources"
+  default     = true
+}
+
 variable "ecs_instance_scaling_create" {
   default     = false
   description = "Do we want to enable instance scaling for this ECS Cluster"

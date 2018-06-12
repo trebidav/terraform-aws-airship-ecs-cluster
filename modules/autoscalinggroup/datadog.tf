@@ -1,7 +1,7 @@
 /* "Datadog agent ECS TASK" */
 
 resource "aws_ecs_task_definition" "datadog_agent" {
-  count        = "${var.datadog_enabled}"
+  count        = "${(var.datadog_enabled && var.create ) ? 1 : 0}"
   family       = "${local.name}-dd-agent-task"
   network_mode = "host"
 

@@ -1,4 +1,6 @@
 data "aws_iam_policy_document" "ecs_service" {
+  count = "${var.create ? 1 : 0 }"
+
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -11,18 +13,21 @@ data "aws_iam_policy_document" "ecs_service" {
 }
 
 resource "aws_iam_role" "ecs_service" {
+  count              = "${var.create ? 1 : 0 }"
   name               = "${var.name}-ecs-role"
   assume_role_policy = "${data.aws_iam_policy_document.ecs_service.json}"
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_service_role_attach" {
+  count      = "${var.create ? 1 : 0 }"
   role       = "${aws_iam_role.ecs_service.name}"
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
 }
 
 resource "aws_iam_instance_profile" "ecs_cluster_ec2_instance_profile" {
-  name = "${var.name}-ecs-cluster-instance-profile"
-  role = "${aws_iam_role.ecs_cluster_ec2_instance_role.id}"
+  count = "${var.create ? 1 : 0 }"
+  name  = "${var.name}-ecs-cluster-instance-profile"
+  role  = "${aws_iam_role.ecs_cluster_ec2_instance_role.id}"
 
   lifecycle {
     create_before_destroy = true
@@ -35,6 +40,8 @@ resource "aws_iam_instance_profile" "ecs_cluster_ec2_instance_profile" {
 }
 
 data "aws_iam_policy_document" "ec2_instance" {
+  count = "${var.create ? 1 : 0 }"
+
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -47,6 +54,7 @@ data "aws_iam_policy_document" "ec2_instance" {
 }
 
 resource "aws_iam_role" "ecs_cluster_ec2_instance_role" {
+  count              = "${var.create ? 1 : 0 }"
   name               = "${var.name}_ecs-cluster-ec2_instance_role"
   assume_role_policy = "${data.aws_iam_policy_document.ec2_instance.json}"
 
@@ -56,8 +64,9 @@ resource "aws_iam_role" "ecs_cluster_ec2_instance_role" {
 }
 
 resource "aws_iam_role_policy" "ecs_cluster_ec2_instance_permissions" {
-  name = "${var.name}-ecs-instance-permissions"
-  role = "${aws_iam_role.ecs_cluster_ec2_instance_role.id}"
+  count = "${var.create ? 1 : 0 }"
+  name  = "${var.name}-ecs-instance-permissions"
+  role  = "${aws_iam_role.ecs_cluster_ec2_instance_role.id}"
 
   policy = <<EOF
 {
