@@ -5,7 +5,8 @@ README
 
 ```hcl
 module "ecs_web" { 
-  source = "github.com/blinkist/airship-tf-ecs-cluster/"
+  source  = "blinkist/airship-ecs-cluster/aws"
+  version = "0.1.0"
 
   name            = "${terraform.workspace}-web"
   environment     = "${terraform.workspace}"
@@ -37,7 +38,8 @@ module "ecs_web" {
 
 ```hcl
 module "ecs_web" { 
-  source = "github.com/blinkist/airship-tf-ecs-cluster/"
+  source  = "blinkist/airship-ecs-cluster/aws"
+  version = "0.1.0"
 
   name            = "${terraform.workspace}-web"
   environment     = "${terraform.workspace}"
@@ -73,8 +75,10 @@ module "ecs_web" {
 
 ```hcl
 # The ECS Draining module, which takes care of the Terminate lifecycle
-module "ecs_draining" {
-  source = "github.com/blinkist/airship-tf-ecs-draining"
+
+module "ecs_draining {
+  source  = "blinkist/airship-ecs-instance-draining/aws"
+  version = "0.1.0"
   name = "web"
 }
 
@@ -88,8 +92,9 @@ data "template_file" "extra_userdata" {
 }
 
 module "ecs_web" { 
-  source = "github.com/blinkist/airship-tf-ecs-cluster/"
-
+  source  = "blinkist/airship-ecs-cluster/aws"
+  version = "0.1.0"
+  
   name            = "${terraform.workspace}-web"
   environment     = "${terraform.workspace}"
 
