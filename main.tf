@@ -37,6 +37,8 @@ module "autoscalinggroup" {
   tags                   = "${var.tags}"
   subnet_ids             = ["${var.subnet_ids}"]
   environment            = "${var.environment}"
+  datadog_enabled        = "${var.datadog_enabled}"
+  datadog_api_key        = "${var.datadog_api_key}"
 }
 
 #
