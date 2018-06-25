@@ -15,7 +15,7 @@ instance_arn=$(curl -s http://localhost:51678/v1/metadata | jq -r '. | .Containe
 #
 # Run Task by Terraform.
 #
-if [ "${efs_enabled}" == "1" ]; then
+if [ "${datadog_enabled}" == "1" ]; then
   echo aws ecs start-task --cluster ${name} --task-definition $$task_def --container-instances $$instance_arn --region ${region} >> /etc/rc.local
 fi
 
