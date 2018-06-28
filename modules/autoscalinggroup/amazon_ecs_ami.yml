@@ -1,23 +1,9 @@
 #!/bin/bash
 set -Eeuxo pipefail
 
-cluster="${name}"
-task_def="dd-agent-task-${name}"
-
 echo ECS_CLUSTER=${name} >> /etc/ecs/ecs.config
 
 echo iptables --insert FORWARD 1 --in-interface docker+ --destination 169.254.169.254/32 --jump DROP >> /etc/rc.local
-
-
-start ecs
-yum install -y aws-cli jq
-instance_arn=$(curl -s http://localhost:51678/v1/metadata | jq -r '. | .ContainerInstanceArn' | awk -F/ '{print $NF}' )
-#
-# Run Task by Terraform.
-#
-if [ "${datadog_enabled}" == "1" ]; then
-  echo aws ecs start-task --cluster ${name} --task-definition $$task_def --container-instances $$instance_arn --region ${region} >> /etc/rc.local
-fi
 
 # EFS MOUNTING
 if [ "${efs_enabled}" == "1" ]; then

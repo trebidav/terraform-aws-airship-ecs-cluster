@@ -1,8 +1,11 @@
 /* "Datadog agent ECS TASK" */
 
+data "aws_region" "_" {}
+
+
 resource "aws_ecs_task_definition" "datadog_agent" {
-  count        = "${(var.datadog_enabled && var.create ) ? 1 : 0}"
-  family       = "${local.name}-dd-agent-task"
+  count        = "${var.create ? 1 : 0}"
+  family       = "${var.name}-dd-agent-task"
   network_mode = "host"
 
   volume {
@@ -63,4 +66,13 @@ resource "aws_ecs_task_definition" "datadog_agent" {
   }
 ]
 EOF
+}
+
+resource "aws_ecs_service" "datadog" {
+  count               = "${var.create ? 1 : 0}"
+  name                = "dd-agent-task"
+  cluster             = "${var.cluster_id}"
+  task_definition     = "${aws_ecs_task_definition.datadog_agent.arn}"
+  scheduling_strategy = "DAEMON"
+
 }
