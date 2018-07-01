@@ -3,7 +3,10 @@ set -Eeuxo pipefail
 
 echo ECS_CLUSTER=${name} >> /etc/ecs/ecs.config
 
-echo iptables --insert FORWARD 1 --in-interface docker+ --destination 169.254.169.254/32 --jump DROP >> /etc/rc.local
+if [ "${block_metadata_service}" == "1" ]; then
+ echo 'while ! iptables -L DOCKER-USER > /dev/null 2>/dev/null ; do echo "Waiting for the iptables DOCKER-USER chain to exist";sleep 1;done' >> /etc/rc.local
+ echo iptables --insert DOCKER-USER 1 --in-interface docker+ --destination 169.254.169.254/32 --jump DROP >> /etc/rc.local
+fi
 
 # EFS MOUNTING
 if [ "${efs_enabled}" == "1" ]; then

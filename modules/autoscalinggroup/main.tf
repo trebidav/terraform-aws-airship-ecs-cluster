@@ -21,7 +21,8 @@ data "template_file" "cloud_config_amazon" {
   vars {
     region          = "${data.aws_region._.name}"
     name            = "${local.name}"
-    efs_enabled     = "${lookup(var.cluster_properties, "efs_enabled","0")}"
+    block_metadata_service  = "${lookup(var.cluster_properties, "block_metadata_service", "0")}"
+    efs_enabled     = "${lookup(var.cluster_properties, "efs_enabled", "0")}"
     efs_id          = "${lookup(var.cluster_properties, "efs_id","")}"
     custom_userdata = "${lookup(var.cluster_properties, "ec2_custom_userdata","")}"
   }
@@ -76,6 +77,17 @@ resource "aws_autoscaling_group" "this" {
   lifecycle {
     create_before_destroy = true
   }
+
+  enabled_metrics = [
+    "GroupMinSize",
+    "GroupMaxSize",
+    "GroupDesiredCapacity",
+    "GroupInServiceInstances",
+    "GroupPendingInstances",
+    "GroupStandbyInstances",
+    "GroupTerminatingInstances",
+    "GroupTotalInstances",
+  ]
 
   tags = ["${concat(
       list(map("key", "Name", "value", local.name, "propagate_at_launch", true)),

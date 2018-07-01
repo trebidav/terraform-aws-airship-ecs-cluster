@@ -64,6 +64,7 @@ variable "cluster_properties" {
     ec2_disk_size       = 50
     ec2_disk_type       = "gp2"
     ec2_custom_userdata = ""
+    block_metadata_service = false
     efs_enabled         = "0"
     efs_id              = ""
   }
