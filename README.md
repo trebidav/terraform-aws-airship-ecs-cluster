@@ -6,7 +6,7 @@ README
 ```hcl
 module "ecs_web" { 
   source  = "blinkist/airship-ecs-cluster/aws"
-  version = "0.4.1"
+  version = "0.4.2"
 
   name            = "${terraform.workspace}-web"
   environment     = "${terraform.workspace}"
@@ -42,7 +42,7 @@ module "ecs_web" {
 ```hcl
 module "ecs_web" { 
   source  = "blinkist/airship-ecs-cluster/aws"
-  version = "0.4.0"
+  version = "0.4.2"
 
   name            = "${terraform.workspace}-web"
   environment     = "${terraform.workspace}"
