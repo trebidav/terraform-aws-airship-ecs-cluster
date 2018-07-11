@@ -82,7 +82,7 @@ resource "aws_iam_role_policy" "asg_publish_to_sns" {
 
 resource "aws_lambda_permission" "drain_lambda" {
   count         = "${var.ecs_instance_scaling_create ? 1 : 0}"
-  statement_id  = "AllowExecutionFromSNS"
+  statement_id  = "AllowExecutionFromSNS-${var.cluster_name}"
   action        = "lambda:InvokeFunction"
   function_name = "${var.ecs_instance_draining_lambda_arn}"
   principal     = "sns.amazonaws.com"
