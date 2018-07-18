@@ -4,6 +4,8 @@
 module "iam" {
   source = "./modules/iam/"
 
+  iam_role_description = "${var.iam_role_description}"
+
   # name is used to create unique rolenames per ecs cluster
   name = "${var.name}"
 

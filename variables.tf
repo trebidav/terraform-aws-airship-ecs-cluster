@@ -84,3 +84,10 @@ variable "datadog_api_key" {
   description = "Datadog API Key"
   default     = false
 }
+
+variable "iam_role_description" {
+  type        = "string"
+  description = "A description of the IAM Role of the instances, sometimes used by 3rd party sw"
+  default = ""
+}
+

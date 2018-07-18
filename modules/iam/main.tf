@@ -56,6 +56,7 @@ data "aws_iam_policy_document" "ec2_instance" {
 resource "aws_iam_role" "ecs_cluster_ec2_instance_role" {
   count              = "${var.create ? 1 : 0 }"
   name               = "${var.name}_ecs-cluster-ec2_instance_role"
+  description        = "${var.iam_role_description}"
   assume_role_policy = "${data.aws_iam_policy_document.ec2_instance.json}"
 
   lifecycle {

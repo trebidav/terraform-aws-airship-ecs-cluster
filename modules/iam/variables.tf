@@ -3,6 +3,11 @@ variable "name" {
   description = "A preferably short unique identifier for this module"
 }
 
+variable "iam_role_description" {
+  type        = "string"
+  description = "A description of the IAM Role of the instances, sometimes used by 3rd party sw"
+}
+
 # UNUSED
 variable "create" {
   default     = true
