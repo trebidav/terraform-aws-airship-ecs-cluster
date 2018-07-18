@@ -9,6 +9,11 @@ output "ecs_cluster_name" {
 }
 
 output "ecs_instance_profile" {
-  description = "aws_iam_role_autodiscovery_role exports the IAM role of the EC2 instance"
+  description = "aws_iam_role_autodiscovery_role exports the instance profile of the EC2 instance"
   value       = "${module.iam.ecs_instance_profile}"
+}
+
+output "ecs_instance_role" {
+  description = "ecs_instance_role exports the IAM role of the EC2 instance"
+  value       = "${module.iam.ecs_instance_role}"
 }
