@@ -2,7 +2,6 @@
 
 data "aws_region" "_" {}
 
-
 resource "aws_ecs_task_definition" "datadog_agent" {
   count        = "${var.create ? 1 : 0}"
   family       = "${var.name}-dd-agent-task"
@@ -74,5 +73,4 @@ resource "aws_ecs_service" "datadog" {
   cluster             = "${var.cluster_id}"
   task_definition     = "${aws_ecs_task_definition.datadog_agent.arn}"
   scheduling_strategy = "DAEMON"
-
 }
