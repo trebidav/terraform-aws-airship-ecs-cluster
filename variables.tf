@@ -56,17 +56,17 @@ variable "cluster_properties" {
   type = "map"
 
   default = {
-    create              = false
-    ec2_key_name        = ""
-    ec2_instance_type   = "t2.small"
-    ec2_asg_min         = 0
-    ec2_asg_max         = 0
-    ec2_disk_size       = 50
-    ec2_disk_type       = "gp2"
-    ec2_custom_userdata = ""
+    create                 = false
+    ec2_key_name           = ""
+    ec2_instance_type      = "t2.small"
+    ec2_asg_min            = 0
+    ec2_asg_max            = 0
+    ec2_disk_size          = 50
+    ec2_disk_type          = "gp2"
+    ec2_custom_userdata    = ""
     block_metadata_service = false
-    efs_enabled         = "0"
-    efs_id              = ""
+    efs_enabled            = "0"
+    efs_id                 = ""
   }
 }
 
@@ -88,6 +88,5 @@ variable "datadog_api_key" {
 variable "iam_role_description" {
   type        = "string"
   description = "A description of the IAM Role of the instances, sometimes used by 3rd party sw"
-  default = ""
+  default     = ""
 }
-

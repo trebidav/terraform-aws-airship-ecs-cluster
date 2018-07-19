@@ -1,5 +1,8 @@
-README
+# AWS ECS Cluster Terraform Module [![Build Status](https://travis-ci.org/blinkist/terraform-aws-airship-ecs-cluster.svg?branch=master)](https://travis-ci.org/blinkist/terraform-aws-airship-ecs-cluster)
 
+## Introduction
+
+This is a partner project to the [AWS ECS Service Terraform Module](https://github.com/blinkist/terraform-aws-airship-ecs-service/). This Terraform module provides a way to easily create and manage Amazon ECS clusters.
 
 ## Usage without ECS Scaling
 

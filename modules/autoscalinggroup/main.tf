@@ -19,12 +19,12 @@ data "template_file" "cloud_config_amazon" {
   template = "${file("${path.module}/amazon_ecs_ami.yml")}"
 
   vars {
-    region          = "${data.aws_region._.name}"
-    name            = "${local.name}"
-    block_metadata_service  = "${lookup(var.cluster_properties, "block_metadata_service", "0")}"
-    efs_enabled     = "${lookup(var.cluster_properties, "efs_enabled", "0")}"
-    efs_id          = "${lookup(var.cluster_properties, "efs_id","")}"
-    custom_userdata = "${lookup(var.cluster_properties, "ec2_custom_userdata","")}"
+    region                 = "${data.aws_region._.name}"
+    name                   = "${local.name}"
+    block_metadata_service = "${lookup(var.cluster_properties, "block_metadata_service", "0")}"
+    efs_enabled            = "${lookup(var.cluster_properties, "efs_enabled", "0")}"
+    efs_id                 = "${lookup(var.cluster_properties, "efs_id","")}"
+    custom_userdata        = "${lookup(var.cluster_properties, "ec2_custom_userdata","")}"
   }
 }
 

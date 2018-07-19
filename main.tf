@@ -59,7 +59,7 @@ module "ecs_instance_scaling" {
 module "datadog" {
   source          = "./modules/datadog/"
   create          = "${var.datadog_enabled && var.create}"
-  name    = "${var.name}"
+  name            = "${var.name}"
   cluster_id      = "${aws_ecs_cluster.this.id}"
   datadog_enabled = "${var.datadog_enabled}"
   datadog_api_key = "${var.datadog_api_key}"
