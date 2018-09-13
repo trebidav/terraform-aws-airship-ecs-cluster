@@ -60,15 +60,21 @@ resource "aws_launch_configuration" "launch_config" {
   }
 }
 
+locals {
+  min_size        = "${lookup(var.cluster_properties, "ec2_asg_min")}"
+  max_size        = "${lookup(var.cluster_properties, "ec2_asg_max")}"
+  placement_group = "${lookup(var.cluster_properties, "ec2_placement_group", "")}"
+}
+
 resource "aws_autoscaling_group" "this" {
   count = "${var.create ? 1 : 0 }"
   name  = "${local.name}"
 
   launch_configuration = "${aws_launch_configuration.launch_config.name}"
 
-  min_size        = "${lookup(var.cluster_properties, "ec2_asg_min")}"
-  max_size        = "${lookup(var.cluster_properties, "ec2_asg_max")}"
-  placement_group = "${lookup(var.cluster_properties, "ec2_placement_group", "")}"
+  min_size        = "${local.min_size}"
+  max_size        = "${local.max_size}"
+  placement_group = "${local.placement_group}"
 
   vpc_zone_identifier = [
     "${var.subnet_ids}",
@@ -93,4 +99,60 @@ resource "aws_autoscaling_group" "this" {
       list(map("key", "Name", "value", local.name, "propagate_at_launch", true)),
       local.tags_asg_format
    )}"]
+}
+
+resource "aws_cloudformation_stack" "autoscaling_group" {
+  name = "${local.name}-cf"
+
+  template_body = <<EOF
+{
+  "Resources": {
+    "ASG": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "VPCZoneIdentifier": ["${var.subnet_ids}"]
+        "LaunchConfigurationName": "${aws_launch_configuration.launch_config.name}"
+        "MaxSize": "${local.max_size}",
+        "MinSize": "${local.min_size}",
+        "PlacementGroup" : "${local.local.placement_group}",
+        "Tags": ["${concat(
+        list(map("key", "Name", "value", local.name, "propagate_at_launch", true)),
+        local.tags_asg_format
+     )}"],
+        "TerminationPolicies": ["OldestLaunchConfiguration", "OldestInstance"],
+        "MetricsCollection": [
+          {
+            "Granularity": "1Minute",
+            "Metrics": [
+              "GroupMinSize",
+              "GroupMaxSize",
+              "GroupDesiredCapacity",
+              "GroupInServiceInstances",
+              "GroupPendingInstances",
+              "GroupStandbyInstances",
+              "GroupTerminatingInstances",
+              "GroupTotalInstances"
+            ]
+            }
+        ],
+        "HealthCheckType": "EC2"
+      },
+      "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+          "MinInstancesInService": "${local.min_size}",
+          "MaxBatchSize": "1",
+          "PauseTime": "PT15M"
+          "WaitOnResourceSignals": "true"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "AsgName": {
+      "Description": "The name of the auto scaling group",
+       "Value": {"Ref": "${local.name}-cf"}
+    }
+  }
+}
+EOF
 }
