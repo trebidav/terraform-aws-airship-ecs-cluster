@@ -72,7 +72,7 @@ locals {
 }
 
 resource "aws_autoscaling_group" "this" {
-  count = "${var.create && ( local.autoscalinggroup_type == "MIGRATION" &&  local.autoscalinggroup_type == "LEGACY" ? 1 : 0 }"
+  count = "${var.create && ( local.autoscalinggroup_type == "MIGRATION" || local.autoscalinggroup_type == "LEGACY" ) ? 1 : 0 }"
   name  = "${local.name}"
 
   launch_configuration = "${aws_launch_configuration.launch_config.name}"
@@ -107,7 +107,7 @@ resource "aws_autoscaling_group" "this" {
 }
 
 resource "aws_cloudformation_stack" "autoscaling_group" {
-  count = "${var.create && ( local.autoscalinggroup_type == "MIGRATION" && local.autoscalinggroup_type == "AUTOUPDATE" ? 1 : 0 }"
+  count = "${var.create && ( local.autoscalinggroup_type == "MIGRATION" || local.autoscalinggroup_type == "AUTOUPDATE" ) ? 1 : 0 }"
   name  = "${local.name}-cf"
 
   template_body = <<EOF
