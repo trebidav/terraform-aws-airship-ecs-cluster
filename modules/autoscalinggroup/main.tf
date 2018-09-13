@@ -120,7 +120,7 @@ resource "aws_cloudformation_stack" "autoscaling_group" {
         "LaunchConfigurationName": "${aws_launch_configuration.launch_config.name}"
         "MaxSize": "${local.max_size}",
         "MinSize": "${local.min_size}",
-        "PlacementGroup" : "${local.local.placement_group}",
+        "PlacementGroup" : "${local.placement_group}",
         "Tags": ["${concat(
         list(map("key", "Name", "value", local.name, "propagate_at_launch", true)),
         local.tags_asg_format
