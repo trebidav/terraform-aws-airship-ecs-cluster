@@ -5,5 +5,5 @@ output "asg_name" {
   # We output "" in case of MIGRATION
 
   value = "${local.autoscalinggroup_type == "MIGRATION" ? "" :
-                      element(concat(aws_autoscaling_group.this.*.name, aws_cloudformation_stack.autoscaling_group.*.outputs["AsgName"] list("")), 0)}"
+                      element(concat(aws_autoscaling_group.this.*.name, aws_cloudformation_stack.autoscaling_group.*.outputs["AsgName"], list("")), 0)}"
 }
