@@ -5,7 +5,7 @@ variable "tags" {
 }
 
 # Small Lookup map to validate route53_record_type
-variable "allowed_asg_types" {
+variable "allowed_autoscalinggroup_types" {
   default = {
     LEGACY     = "LEGACY"
     AUTOUPDATE = "AUTOUPDATE"
