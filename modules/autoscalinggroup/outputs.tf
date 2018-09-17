@@ -12,9 +12,5 @@ output "asg_name" {
   # With autoscalinggroup_type being MIGRATION, we have TWO Autoscaling Groups next to each other. 
   # We output "" in case of MIGRATION
 
-  value = "${local.autoscalinggroup_type == "MIGRATION" ? "" :
-                 (
-                   local.autoscalinggroup_type == "LEGACY" ? "" : local.asgname_cf
-                 )
-           }"
+  value = "${local.autoscalinggroup_type == "LEGACY" || local.autoscalinggroup_type == "MIGRATION" ? "" : local.asgname_cf }"
 }
