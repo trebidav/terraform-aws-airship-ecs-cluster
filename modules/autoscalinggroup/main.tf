@@ -66,9 +66,9 @@ resource "aws_launch_configuration" "launch_config" {
 }
 
 locals {
-  min_size        = "${local.min_size}"
-  max_size        = "${local.max_size}"
-  placement_group = "${local.placement_group}"
+  min_size        = "${lookup(var.cluster_properties, "ec2_asg_min")}"
+  max_size        = "${lookup(var.cluster_properties, "ec2_asg_max")}"
+  placement_group = "${lookup(var.cluster_properties, "ec2_placement_group", "")}"
 }
 
 resource "aws_autoscaling_group" "this" {
@@ -77,9 +77,9 @@ resource "aws_autoscaling_group" "this" {
 
   launch_configuration = "${aws_launch_configuration.launch_config.name}"
 
-  min_size        = "${lookup(var.cluster_properties, "ec2_asg_min")}"
-  max_size        = "${lookup(var.cluster_properties, "ec2_asg_max")}"
-  placement_group = "${lookup(var.cluster_properties, "ec2_placement_group", "")}"
+  min_size        = "${local.min_size}"
+  max_size        = "${local.max_size}"
+  placement_group = "${local.placement_group}"
 
   vpc_zone_identifier = [
     "${var.subnet_ids}",
@@ -108,7 +108,7 @@ resource "aws_autoscaling_group" "this" {
 
 resource "aws_cloudformation_stack" "autoscaling_group" {
   count = "${var.create && ( local.autoscalinggroup_type == "MIGRATION" || local.autoscalinggroup_type == "AUTOUPDATE" ) ? 1 : 0 }"
-  name  = "${local.name}-cf"
+  name  = "${local.name}"
 
   template_body = <<EOF
 {
@@ -156,7 +156,7 @@ resource "aws_cloudformation_stack" "autoscaling_group" {
   "Outputs": {
     "AsgName": {
       "Description": "The name of the auto scaling group",
-       "Value": {"Ref": "${local.name}-cf"}
+       "Value": {"Ref": "${local.name}"}
     }
   }
 }
