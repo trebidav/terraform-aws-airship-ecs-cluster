@@ -47,7 +47,7 @@ module "autoscalinggroup" {
 #
 module "ecs_instance_scaling" {
   source                           = "./modules/ecs_instance_autoscaling/"
-  ecs_instance_scaling_create      = "${var.ecs_instance_scaling_create && var.create}"
+  ecs_instance_scaling_create      = "${var.ecs_instance_scaling_create && var.create && var.autoscalinggroup_type != "MIGRATION"}"
   asg_name                         = "${module.autoscalinggroup.asg_name}"
   cluster_name                     = "${var.name}"
   ecs_instance_draining_lambda_arn = "${var.ecs_instance_draining_lambda_arn}"
