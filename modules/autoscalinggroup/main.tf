@@ -53,6 +53,7 @@ resource "aws_launch_configuration" "launch_config" {
     volume_size           = "${lookup(var.cluster_properties, "ec2_disk_size")}"
     volume_type           = "${lookup(var.cluster_properties, "ec2_disk_type")}"
     delete_on_termination = true
+    encrypted             = "${lookup(var.cluster_properties, "ec2_disk_encryption","false")}"
   }
 
   lifecycle {

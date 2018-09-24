@@ -25,6 +25,7 @@ module "ecs_web" {
     ec2_asg_max = "1"
     ec2_disk_size = "40"
     ec2_disk_type = "gp2"
+    # ec2_disk_encryption = "false"
 
     # block_metadata_service blocks the aws metadata service from the ECS Tasks true / false
     block_metadata_service = true
@@ -61,6 +62,7 @@ module "ecs_web" {
     ec2_asg_max = "1"
     ec2_disk_size = "40"
     ec2_disk_type = "gp2"
+    # ec2_disk_encryption = "false"
     efs_enabled = true
     efs_id = "${module.efs.aws_efs_file_system_sharedfs_id}"
   }
@@ -116,6 +118,7 @@ module "ecs_web" {
     ec2_asg_max = "1"
     ec2_disk_size = "40"
     ec2_disk_type = "gp2"
+    # ec2_disk_encryption = "false"
   }
 
   ecs_instance_scaling_create = true
