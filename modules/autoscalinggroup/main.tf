@@ -46,7 +46,6 @@ resource "aws_launch_configuration" "launch_config" {
     volume_size           = "15"
     volume_type           = "gp2"
     delete_on_termination = true
-    encrypted             = "${lookup(var.cluster_properties, "ec2_disk_encryption","false")}"
   }
 
   ebs_block_device {
