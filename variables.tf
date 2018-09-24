@@ -23,6 +23,11 @@ variable "ecs_instance_scaling_create" {
   description = "Do we want to enable instance scaling for this ECS Cluster"
 }
 
+variable "ecs_instance_ebs_encryption" {
+  default     = false
+  description = "ecs_instance_ebs_encryption sets the Encryption property of the attached EBS Volumes"
+}
+
 variable "ecs_instance_draining_lambda_arn" {
   default     = ""
   description = "The Lambda function arn taking care of the ECS Draining lifecycle"
@@ -63,6 +68,7 @@ variable "cluster_properties" {
     ec2_asg_max            = 0
     ec2_disk_size          = 50
     ec2_disk_type          = "gp2"
+    ec2_disk_encryption    = "false"
     ec2_custom_userdata    = ""
     block_metadata_service = false
     efs_enabled            = "0"
