@@ -115,50 +115,22 @@ resource "aws_cloudformation_stack" "autoscaling_group" {
   "Resources": {
     "ASG": {
       "Type": "AWS::AutoScaling::AutoScalingGroup",
-      "Properties": {
-        "VPCZoneIdentifier": ["${var.subnet_ids}"]
-        "LaunchConfigurationName": "${aws_launch_configuration.launch_config.name}"
-        "MaxSize": "${local.max_size}",
-        "MinSize": "${local.min_size}",
-        "PlacementGroup" : "${local.placement_group}",
-        "Tags": ["${concat(
-        list(map("key", "Name", "value", local.name, "propagate_at_launch", true)),
-        local.tags_asg_format
-     )}"],
-        "TerminationPolicies": ["OldestLaunchConfiguration", "OldestInstance"],
-        "MetricsCollection": [
-          {
-            "Granularity": "1Minute",
-            "Metrics": [
-              "GroupMinSize",
-              "GroupMaxSize",
-              "GroupDesiredCapacity",
-              "GroupInServiceInstances",
-              "GroupPendingInstances",
-              "GroupStandbyInstances",
-              "GroupTerminatingInstances",
-              "GroupTotalInstances"
-            ]
-            }
-        ],
-        "HealthCheckType": "EC2"
-      },
       "UpdatePolicy": {
         "AutoScalingRollingUpdate": {
-          "MinInstancesInService": "${local.min_size}",
+          "MinInstancesInService": "10",
           "MaxBatchSize": "1",
           "PauseTime": "PT15M"
           "WaitOnResourceSignals": "true"
         }
       }
     }
-  },
-  "Outputs": {
-    "AsgName": {
-      "Description": "The name of the auto scaling group",
-       "Value": {"Ref": "${local.name}"}
-    }
   }
 }
 EOF
+}
+
+data "aws_cloudformation_stack" "autoscaling_group" {
+  count      = "${var.create && ( local.autoscalinggroup_type == "MIGRATION" || local.autoscalinggroup_type == "AUTOUPDATE" ) ? 1 : 0 }"
+  name       = "${local.name}"
+  depends_on = ["aws_cloudformation_stack.autoscaling_group"]
 }
