@@ -33,18 +33,3 @@ variable "ami" {
   description = "The ami to use with the autoscaling group instances"
   default     = ""
 }
-
-variable "datadog_enabled" {
-  description = "Is datadog enabled ? "
-  default     = false
-}
-
-variable "datadog_api_key" {
-  description = "Datadog API Key"
-  default     = false
-}
-
-variable "environment" {
-  description = "Which environment are we in ? For datadog"
-  type        = "string"
-}

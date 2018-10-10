@@ -2,88 +2,12 @@
 
 ## Introduction
 
-This is a partner project to the [AWS ECS Service Terraform Module](https://github.com/blinkist/terraform-aws-airship-ecs-service/). This Terraform module provides a way to easily create and manage Amazon ECS clusters.
+This is a partner project to the [AWS ECS Service Terraform Module](https://github.com/blinkist/terraform-aws-airship-ecs-service/). This Terraform module provides a way to easily create and manage Amazon ECS clusters. It does not provide a Lambda function for draining, but it will need an ARN of a lambda in case scaling is enabled. The module will then create the lifecycle hook and permissions needed for automatic draining.
 
-## Usage without ECS Scaling
-
-```hcl
-module "ecs_web" { 
-  source  = "blinkist/airship-ecs-cluster/aws"
-  version = "0.4.2"
-
-  name            = "${terraform.workspace}-web"
-  environment     = "${terraform.workspace}"
-
-  vpc_id          = "${module.vpc.vpc_id}"
-  subnet_ids      = ["${module.vpc.private_subnets}"]
-
-  cluster_properties {
-    create = true
-    ec2_key_name = "${aws_key_pair.main.key_name}"
-    ec2_instance_type = "t2.small"
-    ec2_asg_min = "1"
-    ec2_asg_max = "1"
-    ec2_disk_size = "40"
-    ec2_disk_type = "gp2"
-    # ec2_disk_encryption = "false"
-
-    # block_metadata_service blocks the aws metadata service from the ECS Tasks true / false
-    block_metadata_service = true
-  }
-  
-  ecs_instance_scaling_create = false
-
-  vpc_security_group_ids = ["${module.ecs_instance_sg.this_security_group_id}","${module.admin_sg.this_security_group_id}"]
-
-  tags= { 
-	Environment = "${terraform.workspace}"
-  }
-}
-```
-
-## Usage without ECS Scaling and with EFS mounting
+## Usage Full example, Scaling
 
 ```hcl
-module "ecs_web" { 
-  source  = "blinkist/airship-ecs-cluster/aws"
-  version = "0.4.2"
-
-  name            = "${terraform.workspace}-web"
-  environment     = "${terraform.workspace}"
-
-  vpc_id          = "${module.vpc.vpc_id}"
-  subnet_ids      = ["${module.vpc.private_subnets}"]
-
-  cluster_properties {
-    create = true
-    ec2_key_name = "${aws_key_pair.main.key_name}"
-    ec2_instance_type = "t2.small"
-    ec2_asg_min = "1"
-    ec2_asg_max = "1"
-    ec2_disk_size = "40"
-    ec2_disk_type = "gp2"
-    # ec2_disk_encryption = "false"
-    efs_enabled = true
-    efs_id = "${module.efs.aws_efs_file_system_sharedfs_id}"
-  }
-  
-  ecs_instance_scaling_create = false
-
-  vpc_security_group_ids = ["${module.ecs_instance_sg.this_security_group_id}","${module.admin_sg.this_security_group_id}"]
-
-  tags= { 
-	Environment = "${terraform.workspace}"
-  }
-}
-
-
-```
-
-## Usage with ECS Instance Scaling
-
-```hcl
-# The ECS Draining module, which takes care of the Terminate lifecycle
-
+# ECS Draining module will create a lambda function which takes care of instance draining.
 module "ecs_draining {
   source  = "blinkist/airship-ecs-instance-draining/aws"
   version = "0.1.0"
@@ -101,55 +25,52 @@ data "template_file" "extra_userdata" {
 
 module "ecs_web" { 
   source  = "blinkist/airship-ecs-cluster/aws"
-  version = "0.1.0"
-  
+  version = "0.5.0"
+
+  # name is re-used as a unique identifier for the creation of different resources
   name            = "${terraform.workspace}-web"
-  environment     = "${terraform.workspace}"
 
   vpc_id          = "${module.vpc.vpc_id}"
   subnet_ids      = ["${module.vpc.private_subnets}"]
-  
+
   cluster_properties {
-    create = true
+    # ec2_key_name defines the keypair
     ec2_key_name = "${aws_key_pair.main.key_name}"
-    ec2_custom_userdata = "${data.template_file.extra_userdata.rendered}"
+    # ec2_instance_type defines the instance type
     ec2_instance_type = "t2.small"
+    # ec2_asg_min defines the minimum size of the autoscaling group
     ec2_asg_min = "1"
+    # ec2_asg_max defines the maximum size of the autoscaling group
     ec2_asg_max = "1"
+    # ec2_disk_size defines the size in GB of the non-root volume of the EC2 Instance
     ec2_disk_size = "40"
+    # ec2_disk_size defines the disktype of that EBS Volume
     ec2_disk_type = "gp2"
     # ec2_disk_encryption = "false"
-  }
 
+    # block_metadata_service blocks the aws metadata service from the ECS Tasks true / false, this is preferred security wise
+    block_metadata_service = true
+
+    # efs_enabled sets if EFS should be mounted
+    efs_enabled = true
+    # the id of the EFS volume to mount
+    efs_id = "${module.efs.aws_efs_file_system_sharedfs_id}"
+    # efs_mount_folder defines the folder to which the EFS volume will be mounted to
+    # efs_mount_folder = "/mnt/efs"
+  }
+  
+  # vpc_security_group_ids define the security groups for the ec2 instances.
+  vpc_security_group_ids = ["${module.ecs_instance_sg.this_security_group_id}","${module.admin_sg.this_security_group_id}"]
+
+  # ecs_instance_scaling_create defines if we set autscaling for the autscaling group
+  # NB! NB! A draining lambda ARN needs to be defined !!
   ecs_instance_scaling_create = true
+
+  # The lambda function which takes care of draining the ecs instance
   ecs_instance_draining_lambda_arn = "${module.ecs_draining.lambda_function_arn}"
 
-  datadog_api_key = "Datadog API KEY"
-  datadog_enabled = true
-
+  # ecs_instance_scaling_properties defines how the ECS Cluster scales up / down
   ecs_instance_scaling_properties = [
-   { 
-     type = "CPUReservation"
-     direction = "up"
-     evaluation_periods = 2
-     observation_period = "300"
-     statistic = "Average"
-     threshold = "89"
-     cooldown = "900"
-     adjustment_type = "ChangeInCapacity"
-     scaling_adjustment = "1"
-   },
-   { 
-     type = "CPUReservation"
-     direction = "down"
-     evaluation_periods = 4
-     observation_period = "300"
-     statistic = "Average"
-     threshold = "10"
-     cooldown = "300"
-     adjustment_type = "ChangeInCapacity"
-     scaling_adjustment = "-1"
-   },
    { 
      type = "MemoryReservation"
      direction = "up"
@@ -174,6 +95,32 @@ module "ecs_web" {
    },
   ]
 
+  tags= { 
+	Environment = "${terraform.workspace}"
+  }
+}
+```
+
+## Usage without ECS Scaling and without EFS mounting
+```hcl
+module "ecs_web" { 
+  source  = "blinkist/airship-ecs-cluster/aws"
+  version = "0.5.0"
+
+  name            = "${terraform.workspace}-web"
+
+  vpc_id          = "${module.vpc.vpc_id}"
+  subnet_ids      = ["${module.vpc.private_subnets}"]
+
+  cluster_properties {
+    ec2_key_name = "${aws_key_pair.main.key_name}"
+    ec2_instance_type = "t2.small"
+    ec2_asg_min = "1"
+    ec2_asg_max = "1"
+    ec2_disk_size = "40"
+    ec2_disk_type = "gp2"
+  }
+  
   vpc_security_group_ids = ["${module.ecs_instance_sg.this_security_group_id}","${module.admin_sg.this_security_group_id}"]
 
   tags= { 
@@ -182,7 +129,20 @@ module "ecs_web" {
 }
 ```
 
-## Outputs
+## Usage for fargate
+```hcl
+module "ecs_fargate" { 
+  source  = "blinkist/airship-ecs-cluster/aws"
+  version = "0.5.0"
 
-TODO
+  name = "${terraform.workspace}-web"
 
+  ecs_instance_scaling_create = false
+  # create_roles defines if we create IAM Roles for EC2 instances
+  create_roles                    = false
+  # create_autoscalinggroup defines if we create an ASG for ECS
+  create_autoscalinggroup         = false
+  # ecs_instance_scaling_create     = false
+
+}
+```

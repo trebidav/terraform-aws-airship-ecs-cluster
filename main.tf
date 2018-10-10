@@ -38,7 +38,6 @@ module "autoscalinggroup" {
   iam_instance_profile   = "${module.iam.ecs_instance_profile}"
   tags                   = "${var.tags}"
   subnet_ids             = ["${var.subnet_ids}"]
-  environment            = "${var.environment}"
 }
 
 #
@@ -51,17 +50,4 @@ module "ecs_instance_scaling" {
   cluster_name                     = "${var.name}"
   ecs_instance_draining_lambda_arn = "${var.ecs_instance_draining_lambda_arn}"
   ecs_instance_scaling_properties  = ["${var.ecs_instance_scaling_properties}"]
-}
-
-#
-# Datadog ECS Service
-#
-module "datadog" {
-  source          = "./modules/datadog/"
-  create          = "${var.datadog_enabled && var.create}"
-  name            = "${var.name}"
-  cluster_id      = "${aws_ecs_cluster.this.id}"
-  datadog_enabled = "${var.datadog_enabled}"
-  datadog_api_key = "${var.datadog_api_key}"
-  environment     = "${var.environment}"
 }

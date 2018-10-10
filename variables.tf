@@ -24,22 +24,16 @@ variable "ecs_instance_scaling_create" {
 }
 
 variable "ecs_instance_ebs_encryption" {
-  default     = false
+  default     = true
   description = "ecs_instance_ebs_encryption sets the Encryption property of the attached EBS Volumes"
 }
 
 variable "ecs_instance_draining_lambda_arn" {
-  default     = "NO_SCALING_FUNC"
   description = "The Lambda function arn taking care of the ECS Draining lifecycle"
 }
 
 variable "ecs_instance_scaling_properties" {
   type = "list"
-}
-
-variable "environment" {
-  description = "Which environment are we in ? For datadog"
-  type        = "string"
 }
 
 variable "vpc_id" {
@@ -79,16 +73,6 @@ variable "cluster_properties" {
 variable "tags" {
   type    = "map"
   default = {}
-}
-
-variable "datadog_enabled" {
-  description = "Is datadog enabled ? "
-  default     = false
-}
-
-variable "datadog_api_key" {
-  description = "Datadog API Key"
-  default     = false
 }
 
 variable "iam_role_description" {
