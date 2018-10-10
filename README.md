@@ -43,7 +43,7 @@ module "ecs_web" {
     # ec2_asg_max defines the maximum size of the autoscaling group
     ec2_asg_max = "1"
     # ec2_disk_size defines the size in GB of the non-root volume of the EC2 Instance
-    ec2_disk_size = "40"
+    ec2_disk_size = "100"
     # ec2_disk_size defines the disktype of that EBS Volume
     ec2_disk_type = "gp2"
     # ec2_disk_encryption = "false"
@@ -117,7 +117,7 @@ module "ecs_web" {
     ec2_instance_type = "t2.small"
     ec2_asg_min = "1"
     ec2_asg_max = "1"
-    ec2_disk_size = "40"
+    ec2_disk_size = "100"
     ec2_disk_type = "gp2"
   }
   
@@ -129,7 +129,7 @@ module "ecs_web" {
 }
 ```
 
-## Usage for fargate
+## Usage for Fargate
 ```hcl
 module "ecs_fargate" { 
   source  = "blinkist/airship-ecs-cluster/aws"
