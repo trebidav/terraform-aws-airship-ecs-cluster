@@ -29,7 +29,7 @@ variable "ecs_instance_ebs_encryption" {
 }
 
 variable "ecs_instance_draining_lambda_arn" {
-  default     = ""
+  default     = "NO_SCALING_FUNC"
   description = "The Lambda function arn taking care of the ECS Draining lifecycle"
 }
 
