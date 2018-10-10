@@ -4,7 +4,7 @@
 
 This is a partner project to the [AWS ECS Service Terraform Module](https://github.com/blinkist/terraform-aws-airship-ecs-service/). This Terraform module provides a way to easily create and manage Amazon ECS clusters. It does not provide a Lambda function for draining, but it will need an ARN of a lambda in case scaling is enabled. The module will then create the lifecycle hook and permissions needed for automatic draining.
 
-## Usage Full example, Scaling
+## Usage Full example, Scaling and EFS mounting enabled
 
 ```hcl
 # ECS Draining module will create a lambda function which takes care of instance draining.
