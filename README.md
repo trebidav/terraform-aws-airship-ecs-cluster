@@ -46,7 +46,7 @@ module "ecs_web" {
     ec2_disk_size = "100"
     # ec2_disk_type defines the disktype of that EBS Volume
     ec2_disk_type = "gp2"
-    # ec2_disk_encryption = "false"
+    # ec2_disk_encryption = "true"
 
     # block_metadata_service blocks the aws metadata service from the ECS Tasks true / false, this is preferred security wise
     block_metadata_service = true
