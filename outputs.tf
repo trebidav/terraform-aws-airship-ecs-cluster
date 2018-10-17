@@ -19,6 +19,6 @@ output "ecs_instance_role" {
 }
 
 output "asg_name" {
-  description = "asg_name exports the name of the autscalinggroup in case one is created"
+  description = "asg_name exports the name of the autoscalinggroup if one is created"
   value       = "${module.autoscalinggroup.asg_name}"
 }

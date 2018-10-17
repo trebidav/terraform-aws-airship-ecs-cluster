@@ -44,7 +44,7 @@ module "ecs_web" {
     ec2_asg_max = "1"
     # ec2_disk_size defines the size in GB of the non-root volume of the EC2 Instance
     ec2_disk_size = "100"
-    # ec2_disk_size defines the disktype of that EBS Volume
+    # ec2_disk_type defines the disktype of that EBS Volume
     ec2_disk_type = "gp2"
     # ec2_disk_encryption = "false"
 
@@ -55,14 +55,14 @@ module "ecs_web" {
     efs_enabled = true
     # the id of the EFS volume to mount
     efs_id = "${module.efs.aws_efs_file_system_sharedfs_id}"
-    # efs_mount_folder defines the folder to which the EFS volume will be mounted to
+    # efs_mount_folder defines the folder to which the EFS volume will be mounted
     # efs_mount_folder = "/mnt/efs"
   }
   
-  # vpc_security_group_ids define the security groups for the ec2 instances.
+  # vpc_security_group_ids defines the security groups for the ec2 instances.
   vpc_security_group_ids = ["${module.ecs_instance_sg.this_security_group_id}","${module.admin_sg.this_security_group_id}"]
 
-  # ecs_instance_scaling_create defines if we set autscaling for the autscaling group
+  # ecs_instance_scaling_create defines if we set autscaling for the autoscaling group
   # NB! NB! A draining lambda ARN needs to be defined !!
   ecs_instance_scaling_create = true
 
@@ -95,7 +95,7 @@ module "ecs_web" {
    },
   ]
 
-  tags= { 
+  tags = { 
 	Environment = "${terraform.workspace}"
   }
 }
@@ -137,7 +137,6 @@ module "ecs_fargate" {
 
   name = "${terraform.workspace}-web"
 
-  ecs_instance_scaling_create = false
   # create_roles defines if we create IAM Roles for EC2 instances
   create_roles                    = false
   # create_autoscalinggroup defines if we create an ASG for ECS
