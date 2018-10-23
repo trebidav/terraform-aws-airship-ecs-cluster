@@ -34,7 +34,8 @@ variable "ecs_instance_draining_lambda_arn" {
 }
 
 variable "ecs_instance_scaling_properties" {
-  type = "list"
+  type    = "list"
+  default = []
 }
 
 variable "vpc_id" {
