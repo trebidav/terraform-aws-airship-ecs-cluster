@@ -38,6 +38,8 @@ module "ecs_web" {
     ec2_key_name = "${aws_key_pair.main.key_name}"
     # ec2_instance_type defines the instance type
     ec2_instance_type = "t2.small"
+    # ec2_custom_userdata sets the launch configuration userdata for the EC2 instances
+    ec2_custom_userdata = "${data.template_file.extra_userdata.rendered}"
     # ec2_asg_min defines the minimum size of the autoscaling group
     ec2_asg_min = "1"
     # ec2_asg_max defines the maximum size of the autoscaling group
