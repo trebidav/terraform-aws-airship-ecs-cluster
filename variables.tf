@@ -41,6 +41,7 @@ variable "ecs_instance_scaling_properties" {
 variable "vpc_id" {
   type        = "string"
   description = "the main vpc identifier"
+  default     = ""
 }
 
 variable "vpc_security_group_ids" {
@@ -51,6 +52,7 @@ variable "vpc_security_group_ids" {
 variable "subnet_ids" {
   type        = "list"
   description = "the list of subnet_ids the autoscaling groups will use"
+  default     = []
 }
 
 variable "cluster_properties" {
