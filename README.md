@@ -1,4 +1,4 @@
-# AWS ECS Cluster Terraform Module [![Build Status](https://travis-ci.org/blinkist/terraform-aws-airship-ecs-cluster.svg?branch=master)](https://travis-ci.org/blinkist/terraform-aws-airship-ecs-cluster)
+# AWS ECS Cluster Terraform Module [![Build Status](https://travis-ci.org/blinkist/terraform-aws-airship-ecs-cluster.svg?branch=master)](https://travis-ci.org/blinkist/terraform-aws-airship-ecs-cluster) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
 
 ## Introduction
 
