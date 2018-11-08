@@ -24,6 +24,7 @@ data "template_file" "cloud_config_amazon" {
     block_metadata_service = "${lookup(var.cluster_properties, "block_metadata_service", "0")}"
     efs_enabled            = "${lookup(var.cluster_properties, "efs_enabled", "0")}"
     efs_id                 = "${lookup(var.cluster_properties, "efs_id","")}"
+    efs_mount_folder       = "${lookup(var.cluster_properties, "efs_mount_folder","/mnt/efs")}"
     custom_userdata        = "${lookup(var.cluster_properties, "ec2_custom_userdata","")}"
   }
 }
@@ -53,7 +54,7 @@ resource "aws_launch_configuration" "launch_config" {
     volume_size           = "${lookup(var.cluster_properties, "ec2_disk_size")}"
     volume_type           = "${lookup(var.cluster_properties, "ec2_disk_type")}"
     delete_on_termination = true
-    encrypted             = "${lookup(var.cluster_properties, "ec2_disk_encryption","false")}"
+    encrypted             = "${lookup(var.cluster_properties, "ec2_disk_encryption","true")}"
   }
 
   lifecycle {
