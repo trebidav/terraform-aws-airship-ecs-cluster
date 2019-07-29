@@ -29,58 +29,54 @@ data "template_file" "cloud_config_amazon" {
   }
 }
 
-resource "aws_launch_configuration" "launch_config" {
+resource "aws_launch_template" "launch_template" {
   count = "${var.create ? 1 : 0 }"
 
-  name_prefix   = "${local.name}-"
-  image_id      = "${data.aws_ami.ecs_ami.id}"
-  instance_type = "${lookup(var.cluster_properties, "ec2_instance_type")}"
-  key_name      = "${lookup(var.cluster_properties, "ec2_key_name")}"
+  name_prefix            = "${local.name}-"
+  description            = "Template for EC2 instances used by ECS"
+  image_id               = "${data.aws_ami.ecs_ami.id}"
+  instance_type          = "${lookup(var.cluster_properties, "ec2_instance_type")}"
+  key_name               = "${lookup(var.cluster_properties, "ec2_key_name")}"
+  vpc_security_group_ids = ["${var.vpc_security_group_ids}"]
+  user_data              = "${base64encode(data.template_file.cloud_config_amazon.rendered)}"
 
-  security_groups = ["${var.vpc_security_group_ids}"]
-
-  iam_instance_profile = "${var.iam_instance_profile}"
-
-  user_data = "${data.template_file.cloud_config_amazon.rendered}"
-
-  root_block_device {
-    volume_size           = "15"
-    volume_type           = "gp2"
-    delete_on_termination = true
+  iam_instance_profile = {
+    arn = "${var.iam_instance_profile}"
   }
 
-  ebs_block_device {
-    device_name           = "/dev/xvdcz"
-    volume_size           = "${lookup(var.cluster_properties, "ec2_disk_size")}"
-    volume_type           = "${lookup(var.cluster_properties, "ec2_disk_type")}"
-    delete_on_termination = true
-    encrypted             = "${lookup(var.cluster_properties, "ec2_disk_encryption","true")}"
+  monitoring {
+    enabled = true
   }
+
+  block_device_mappings = [
+    {
+      device_name = "/dev/xvda"
+
+      ebs = {
+        volume_size           = "15"
+        volume_type           = "gp2"
+        delete_on_termination = true
+      }
+    },
+    {
+      device_name = "/dev/xvdcz"
+
+      ebs = {
+        volume_size           = "${lookup(var.cluster_properties, "ec2_disk_size")}"
+        volume_type           = "${lookup(var.cluster_properties, "ec2_disk_type")}"
+        delete_on_termination = true
+        encrypted             = "${lookup(var.cluster_properties, "ec2_disk_encryption","true")}"
+      }
+    },
+  ]
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "aws_autoscaling_group" "this" {
-  count = "${var.create ? 1 : 0 }"
-  name  = "${local.name}"
-
-  launch_configuration = "${aws_launch_configuration.launch_config.name}"
-
-  min_size        = "${lookup(var.cluster_properties, "ec2_asg_min")}"
-  max_size        = "${lookup(var.cluster_properties, "ec2_asg_max")}"
-  placement_group = "${lookup(var.cluster_properties, "ec2_placement_group", "")}"
-
-  vpc_zone_identifier = [
-    "${var.subnet_ids}",
-  ]
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  enabled_metrics = [
+locals {
+  asg_enabled_metrics = [
     "GroupMinSize",
     "GroupMaxSize",
     "GroupDesiredCapacity",
@@ -91,8 +87,59 @@ resource "aws_autoscaling_group" "this" {
     "GroupTotalInstances",
   ]
 
-  tags = ["${concat(
+  asg_tags = ["${concat(
       list(map("key", "Name", "value", local.name, "propagate_at_launch", true)),
       local.tags_asg_format
    )}"]
+}
+
+# An ASG where every node is identical
+resource "aws_autoscaling_group" "homogenous" {
+  count = "${var.create && !var.enable_mixed_cluster ? 1 : 0 }"
+  name  = "${local.name}"
+
+  launch_template = {
+    id      = "${aws_launch_template.launch_template.id}"
+    version = "$Latest"
+  }
+
+  min_size            = "${lookup(var.cluster_properties, "ec2_asg_min")}"
+  max_size            = "${lookup(var.cluster_properties, "ec2_asg_max")}"
+  placement_group     = "${lookup(var.cluster_properties, "ec2_placement_group", "")}"
+  vpc_zone_identifier = ["${var.subnet_ids}"]
+  enabled_metrics     = ["${local.asg_enabled_metrics}"]
+  tags                = ["${local.asg_tags}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_autoscaling_group" "heterogenous" {
+  count = "${var.create && var.enable_mixed_cluster ? 1 : 0 }"
+  name  = "${local.name}"
+
+  #name  = "dummy"
+
+  mixed_instances_policy = {
+    instances_distribution = ["${var.mixed_cluster_instances_distribution}"]
+
+    launch_template {
+      launch_template_specification {
+        launch_template_id = "${aws_launch_template.launch_template.id}"
+        version            = "$Latest"
+      }
+
+      override = ["${var.mixed_cluster_launch_template_override}"]
+    }
+  }
+  min_size            = "${lookup(var.cluster_properties, "ec2_asg_min")}"
+  max_size            = "${lookup(var.cluster_properties, "ec2_asg_max")}"
+  placement_group     = "${lookup(var.cluster_properties, "ec2_placement_group", "")}"
+  vpc_zone_identifier = ["${var.subnet_ids}"]
+  enabled_metrics     = ["${local.asg_enabled_metrics}"]
+  tags                = ["${local.asg_tags}"]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
