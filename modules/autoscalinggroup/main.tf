@@ -57,6 +57,11 @@ resource "aws_launch_configuration" "launch_config" {
     encrypted             = "${lookup(var.cluster_properties, "ec2_disk_encryption","true")}"
   }
 
+  tag_specifications {
+    resource_type = "volume"
+    tags          = "${var.tags}"
+  }
+
   lifecycle {
     create_before_destroy = true
   }
