@@ -20,6 +20,11 @@ variable "name" {
   description = "The description of the ASG"
 }
 
+variable "cluster_name" {
+  default     = ""
+  description = "ecs cluster name to use in userdata"
+}
+
 variable "subnet_ids" {
   description = "The list of subnets where the ASG can reside"
   type        = "list"

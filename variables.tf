@@ -3,8 +3,19 @@ variable "name" {
   description = "the short name of the environment that is used to define it"
 }
 
+variable "cluster_name" {
+  type        = "string"
+  description = "ECS cluster name if different from name variable"
+  default     = ""
+}
+
 variable "create" {
   description = "Are we creating resources"
+  default     = true
+}
+
+variable "create_cluster" {
+  description = "Are we creating ecs cluster"
   default     = true
 }
 

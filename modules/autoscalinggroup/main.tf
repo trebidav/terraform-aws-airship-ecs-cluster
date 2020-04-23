@@ -3,6 +3,7 @@ data "aws_region" "_" {}
 locals {
   tags_asg_format = ["${null_resource.tags_as_list_of_maps.*.triggers}"]
   name            = "${var.name}"
+  cluster_name    = "${var.cluster_name == "" ? var.name : var.cluster_name}"
 }
 
 resource "null_resource" "tags_as_list_of_maps" {
@@ -20,7 +21,7 @@ data "template_file" "cloud_config_amazon" {
 
   vars {
     region                 = "${data.aws_region._.name}"
-    name                   = "${local.name}"
+    name                   = "${local.cluster_name}"
     block_metadata_service = "${lookup(var.cluster_properties, "block_metadata_service", "0")}"
     efs_enabled            = "${lookup(var.cluster_properties, "efs_enabled", "0")}"
     efs_id                 = "${lookup(var.cluster_properties, "efs_id","")}"
