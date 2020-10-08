@@ -73,6 +73,10 @@ resource "aws_launch_template" "launch_template" {
 
   lifecycle {
     create_before_destroy = true
+
+    ignore_changes = [
+      "description",
+    ]
   }
 }
 
