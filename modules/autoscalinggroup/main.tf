@@ -50,15 +50,6 @@ resource "aws_launch_template" "launch_template" {
 
   block_device_mappings = [
     {
-      device_name = "/dev/xvda"
-
-      ebs = {
-        volume_size           = "15"
-        volume_type           = "gp2"
-        delete_on_termination = true
-      }
-    },
-    {
       device_name = "/dev/xvdcz"
 
       ebs = {
