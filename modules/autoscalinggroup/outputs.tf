@@ -5,5 +5,5 @@ output "asg_name" {
 
 output "lt_name" {
   description = "The name of the launch template"
-  value       = "${aws_launch_template.launch_template.name}"
+  value       = "${aws_launch_template.launch_template.*.name}"
 }
